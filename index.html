@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sienna's Reading Test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f4f1ea;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    padding: 50px 60px;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+  }
+  .level {
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #8a7e6b;
+    margin-bottom: 20px;
+  }
+  .sentence {
+    font-size: 42px;
+    font-weight: 600;
+    color: #2c2c2c;
+    line-height: 1.4;
+    margin-bottom: 50px;
+    min-height: 120px;
+  }
+  .buttons {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+  }
+  button {
+    font-size: 26px;
+    font-weight: 700;
+    padding: 22px 60px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  button:hover { transform: scale(1.05); }
+  button:active { transform: scale(0.97); }
+  .correct {
+    background: #4caf50;
+    color: white;
+    box-shadow: 0 4px 15px rgba(76,175,80,0.4);
+  }
+  .incorrect {
+    background: #f44336;
+    color: white;
+    box-shadow: 0 4px 15px rgba(244,67,54,0.4);
+  }
+  .progress {
+    margin-top: 30px;
+    font-size: 16px;
+    color: #8a7e6b;
+  }
+  .done {
+    font-size: 36px;
+    color: #4caf50;
+    font-weight: 700;
+  }
+  .score {
+    font-size: 20px;
+    color: #2c2c2c;
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="level" id="level">Word</div>
+  <div class="sentence" id="sentence">Loading...</div>
+  <div class="buttons">
+    <button class="correct" onclick="answer(true)">Correct</button>
+    <button class="incorrect" onclick="answer(false)">Incorrect</button>
+  </div>
+  <div class="progress" id="progress"></div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+const items = [
+  // Words (level 1)
+  { text: "cat", level: "Word" },
+  { text: "dog", level: "Word" },
+  { text: "sun", level: "Word" },
+  { text: "hat", level: "Word" },
+  { text: "pig", level: "Word" },
+  { text: "red", level: "Word" },
+  // Short words (level 1-2)
+  { text: "butterfly", level: "Word" },
+  { text: "elephant", level: "Word" },
+  { text: "mountain", level: "Word" },
+  { text: "refrigerator", level: "Word" },
+  { text: "wonderful", level: "Word" },
+  { text: "kitchen", level: "Word" },
+  { text: "library", level: "Word" },
+  { text: "adventure", level: "Word" },
+  { text: "chocolate", level: "Word" },
+  { text: "neighborhood", level: "Word" },
+  { text: "impossible", level: "Word" },
+  { text: "extraordinary", level: "Word" },
+  { text: "curiosity", level: "Word" },
+  // Grade 1 sentences
+  { text: "The cat sat on the mat.", level: "Grade 1" },
+  { text: "I like to play with my dog.", level: "Grade 1" },
+  { text: "The sun is very bright today.", level: "Grade 1" },
+  // Grade 2 sentences
+  { text: "The curious fox explored the extraordinary forest.", level: "Grade 2" },
+  { text: "The librarian read a mysterious book to the neighborhood children.", level: "Grade 2" },
+  { text: "She whispered a secret to her best friend under the stars.", level: "Grade 2" },
+  // Grade 3 sentences
+  { text: "The brave knight defended the castle during the great storm.", level: "Grade 3" },
+  { text: "The ancient tree in the garden grew taller than the house.", level: "Grade 3" },
+  { text: "Dinosaurs ruled the Earth for over one hundred sixty million years.", level: "Grade 3" },
+  { text: "Water freezes at thirty-two degrees Fahrenheit.", level: "Grade 3" },
+  { text: "Honey never spoils.", level: "Grade 3" },
+  { text: "Octopuses have three hearts and blue blood.", level: "Grade 3" },
+  { text: "Penguins cannot fly, but they are excellent swimmers.", level: "Grade 3" },
+  // Grade 4 sentences
+  { text: "The photographer captured a breathtaking sunset over the mountains.", level: "Grade 4" },
+  { text: "Scientists discovered a new species of butterfly in the rainforest.", level: "Grade 4" },
+  { text: "The old lighthouse guided ships safely through the foggy night.", level: "Grade 4" },
+];
+
+let index = 0;
+let correctCount = 0;
+let incorrectCount = 0;
+
+function show() {
+  if (index >= items.length) {
+    document.getElementById('sentence').className = 'done';
+    document.getElementById('sentence').textContent = 'All done!';
+    document.getElementById('level').textContent = '';
+    document.querySelector('.buttons').style.display = 'none';
+    document.getElementById('progress').textContent = '';
+    document.getElementById('score').textContent = 'Score: ' + correctCount + ' correct, ' + incorrectCount + ' incorrect out of ' + items.length;
+    return;
+  }
+  const item = items[index];
+  document.getElementById('sentence').className = 'sentence';
+  document.getElementById('sentence').textContent = item.text;
+  document.getElementById('level').textContent = item.level;
+  document.getElementById('progress').textContent = (index + 1) + ' of ' + items.length;
+}
+
+function answer(isCorrect) {
+  if (isCorrect) correctCount++;
+  else incorrectCount++;
+  index++;
+  show();
+}
+
+show();
+</script>
+</body>
+</html>
